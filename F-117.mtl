@@ -1,0 +1,74 @@
+newmtl 51911afb-3794-4a57-9662-20c7bbeb154d
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ns 30
+Ke 0.000 0.000 0.000
+map_Kd textures/f_117_c.jpg
+map_Ks textures/f_117_n_s.jpg
+map_normal textures/f_117_n_n.jpg
+map_ao textures/f_117_n_ao.jpg
+
+newmtl 80aa9aa0-3ef6-42d2-b3f8-a3480b7b7b1f
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ns 30
+Ke 0.000 0.000 0.000
+map_Kd textures/f_117_interior_c.jpg
+map_Ks textures/f_117_interior_n_s.jpg
+map_normal textures/f_117_interior_n_n.jpg
+map_ao textures/f_117_interior_n_ao.jpg
+
+newmtl 9275bc17-21b0-42b2-b3f3-501cd37cd6c7
+Kd 0.000 0.000 0.000
+Ks 1.000 1.000 1.000
+Ns 255
+Ke 0.000 0.000 0.000
+d 0.17
+
+newmtl c064e974-80f8-4f65-bb0f-c08cb9f818b4
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ns 30
+Ke 0.000 0.000 0.000
+map_Kd textures/us_gbu_gsn_c.jpg
+map_Ks textures/us_gbu_gsn_n_s.jpg
+map_normal textures/us_gbu_gsn_n_n.jpg
+map_ao textures/us_gbu_gsn_n_ao.jpg
+
+newmtl 593b16f6-0281-4de8-973d-7df2624ddeab
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ns 30
+Ke 0.000 0.000 0.000
+map_Kd textures/us_500lb_mk_82_gbu_c.jpg
+map_Ks textures/us_500lb_mk_82_gbu_n_s.jpg
+map_normal textures/us_500lb_mk_82_gbu_n_n.jpg
+map_ao textures/us_500lb_mk_82_gbu_n_ao.jpg
+
+newmtl e5705c80-1fda-4427-adf1-f871f5ec252c
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ns 30
+Ke 0.000 0.000 0.000
+map_Kd textures/us_500_lb_gbu_12_c.jpg
+map_Ks textures/us_500_lb_gbu_12_n_s.jpg
+map_normal textures/us_500_lb_gbu_12_n_n.jpg
+map_ao textures/us_500_lb_gbu_12_n_ao.jpg
+
+newmtl 76cf964d-16de-4633-b439-e4c4d028e99f
+Kd 0.000 0.000 0.000
+Ks 0.000 0.000 0.000
+Ns 255
+Ke 0.000 0.000 0.000
+d 0.3
+
+newmtl 323851f7-9aff-42e4-a630-ec0095ceb8ae
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ns 30
+Ke 0.000 0.000 0.000
+map_Kd textures/f_117_seat_c.jpg
+map_Ks textures/f_117_seat_n_s.jpg
+map_normal textures/f_117_seat_n_n.jpg
+map_ao textures/f_117_seat_n_ao.jpg
+
