@@ -86,6 +86,25 @@ Window {
         property int cornerMarkThick:   2       // Толщина скобок
     }
 
+    Rectangle {
+        id: statusDot1
+        height: parent.height * .025
+        width: height
+        radius: height / 2
+        color: tcpClient.connected ? "lightgreen" : "red"
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.topMargin: 20
+        anchors.leftMargin: 20
+
+        // Пульсация
+        SequentialAnimation on opacity {
+            loops: Animation.Infinite
+            NumberAnimation { to: 0.3; duration: 800 }
+            NumberAnimation { to: 1.0; duration: 800 }
+        }
+    }
+
     // ПЕРЕИСПОЛЬЗУЕМЫЙ КОМПОНЕНТ ТАКТИЧЕСКОЙ КНОПКИ
     Component {
         id: tacticalButton
