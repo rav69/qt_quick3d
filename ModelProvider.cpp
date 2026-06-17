@@ -1,4 +1,4 @@
-#include "modelprovider.h"
+#include "ModelProvider.h"
 #include <QCoreApplication>
 #include <QDir>
 #include <QUrl>

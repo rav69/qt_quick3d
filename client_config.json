@@ -1,0 +1,16 @@
+{
+    "server": {
+        "address": "192.9.192.211",
+        "port": 8089
+    },
+    "heartbeat": {
+        "interval_ms": 2000,
+        "timeout_ms": 8000
+    },
+    "reconnect": {
+        "base_ms": 1000,
+        "max_ms": 30000,
+        "auto_connect": true
+    },
+    "log_prefix": "[CLIENT]"
+}
