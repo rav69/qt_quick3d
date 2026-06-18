@@ -8,7 +8,7 @@
 Q_DECLARE_LOGGING_CATEGORY(lcTcpClient)
 
 struct ClientConfig {
-    QString address = "192.9.192.5";
+    QString address = "192.9.192.215";
     quint16 port = 8089;
     int heartbeatMs = 2000;
     int heartbeatTimeoutMs = 8000;

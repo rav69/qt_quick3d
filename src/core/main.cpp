@@ -4,8 +4,8 @@
 #include <QSurfaceFormat>
 #include <QDebug>
 
-#include "ModelProvider.h"
-#include "TcpClientConnectionHandler.h"
+#include "../models/ModelProvider.h"
+#include "../network/TcpClientConnectionHandler.h"
 
 int main(int argc, char *argv[])
 {
@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
     // Экспортируем TCP-клиент в QML (опционально)
     engine.rootContext()->setContextProperty("tcpClient", &tcpClient);
 
-    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
+    engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));
     if (engine.rootObjects().isEmpty()) {
         qCritical() << "Failed to load QML";
         return -1;

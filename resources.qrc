@@ -1,8 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>main.qml</file>
-        <file>DynamicModel.qml</file>
-        <file>SingleModel.qml</file>
-        <file>ModelViewer.qml</file>
-    </qresource>
-</RCC>
