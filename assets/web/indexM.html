@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maptalks OSM</title>
+    <!-- Подключаем CSS Maptalks -->
+    <link rel="stylesheet" href="https://unpkg.com/maptalks/dist/maptalks.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        #map {
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <!-- Подключаем JS Maptalks -->
+    <script src="https://unpkg.com/maptalks/dist/maptalks.min.js"></script>
+    <script>
+        // Создаем карту
+        var map = new maptalks.Map('map', {
+            // center: [55.76, 37.64], // [широта, долгота] - Москва
+            center: [37.76, 55.64], // [широта, долгота] - Москва
+            zoom: 12,
+            baseLayer: new maptalks.TileLayer('base', {
+                urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                subdomains: ['a', 'b', 'c'],
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            })
+        });
+    </script>
+</body>
+</html>

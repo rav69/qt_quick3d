@@ -1,3 +1,7 @@
+// ============================================================
+// src/models/ModelProvider.cpp
+// ============================================================
+
 #include "ModelProvider.h"
 #include <QCoreApplication>
 #include <QDir>
@@ -9,7 +13,7 @@ ModelProvider::ModelProvider(QObject *parent) : QObject(parent) {}
 
 QVariantList ModelProvider::getMeshUrls(const QString &modelName)
 {
-    // Формируем путь: /путь_к_exe/models/имя_модели
+    // Build path: /path_to_exe/models/model_name/meshes
     QString dirPath = QCoreApplication::applicationDirPath() + "/models/" + modelName + "/meshes";
     QDir dir(dirPath);
 
@@ -18,12 +22,12 @@ QVariantList ModelProvider::getMeshUrls(const QString &modelName)
         return QVariantList();
     }
 
-    // Ищем все .mesh файлы в этой папке
+    // Find all .mesh files in this folder
     QFileInfoList files = dir.entryInfoList(QStringList() << "*.mesh", QDir::Files);
     QVariantList urls;
 
     for (const QFileInfo &file : files) {
-        // QUrl::fromLocalFile идеально работает в Астра Линукс
+        // QUrl::fromLocalFile works perfectly in Astra Linux
         urls.append(QUrl::fromLocalFile(file.absoluteFilePath()));
     }
 
@@ -54,21 +58,3 @@ QString ModelProvider::getMaterialQmlUrl(const QString &modelName)
 
     return QUrl::fromLocalFile(qmlFiles.first().absoluteFilePath()).toString();
 }
-//QString ModelProvider::getMaterialQmlUrl(const QString &modelName)
-//{
-//    // !!! ЗАМЕНИ "Material_0.qml" на ТОЧНОЕ имя файла, который создал Balsam !!!
-//    QString materialFileName = "Material_0.qml";
-
-////    QString fullPath = QCoreApplication::applicationDirPath() + "/models/" + modelName + "/maps/" + materialFileName;
-//    QString fullPath = QCoreApplication::applicationDirPath() + "/models/" + modelName + "/" + materialFileName;
-//    QFileInfo fi(fullPath);
-
-//    if (fi.exists()) {
-//        // Возвращаем абсолютный URL: "file:///home/.../maps/Material_0.qml"
-//        // Возвращаем абсолютный URL: "file:///home/.../Material_0.qml"
-//        return QUrl::fromLocalFile(fi.absoluteFilePath()).toString();
-//    }
-
-//    qWarning() << "Файл материала не найден:" << fullPath;
-//    return "";
-//}

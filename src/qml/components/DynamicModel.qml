@@ -1,9 +1,14 @@
+// ============================================================
+// src/qml/components/DynamicModel.qml
+// ============================================================
+
 import QtQuick 2.15
 import QtQuick3D 1.15
 
 Node {
     id: rootNode
 
+    property bool debugInfo: false
     property string modelName: "f117"
     property vector3d modelScale: Qt.vector3d(1, 1, 1)
 
@@ -11,12 +16,12 @@ Node {
         var meshUrls = modelProvider.getMeshUrls(modelName);
         var materialUrl = modelProvider.getMaterialQmlUrl(modelName);
 
-        console.log("=== Загрузка модели:", modelName, "===");
-        console.log("URL материала:", materialUrl);
+        if (debugInfo) console.log("=== Загрузка модели:", modelName, "===");
+        if (debugInfo) console.log("URL материала:", materialUrl);
 
         var modelComponent = Qt.createComponent("SingleModel.qml");
         if (modelComponent.status !== Component.Ready) {
-            console.error("❌ Ошибка SingleModel.qml:", modelComponent.errorString());
+            if (debugInfo) console.error("❌ Ошибка SingleModel.qml:", modelComponent.errorString());
             return;
         }
 
@@ -29,9 +34,9 @@ Node {
                 // Создаем экземпляр материала.
                 // Важно: создаем его с родителем rootNode, чтобы он жил в памяти
                 materialInstance = matComponent.createObject(rootNode);
-                console.log("✅ Материал успешно загружен из:", materialUrl);
+                if (debugInfo) console.log("✅ Материал успешно загружен из:", materialUrl);
             } else {
-                console.error("❌ Ошибка загрузки материала:", matComponent.errorString());
+                if (debugInfo) console.error("❌ Ошибка загрузки материала:", matComponent.errorString());
             }
         }
 
@@ -49,10 +54,10 @@ Node {
 
             var model = modelComponent.createObject(rootNode, props);
             if (!model) {
-                console.error("❌ Ошибка создания модели:", meshUrls[i]);
+                if (debugInfo) console.error("❌ Ошибка создания модели:", meshUrls[i]);
             }
         }
 
-        console.log("✅ Завершено. Объектов:", rootNode.children.length);
+        if (debugInfo) console.log("✅ Завершено. Объектов:", rootNode.children.length);
     }
 }

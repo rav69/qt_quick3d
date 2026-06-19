@@ -13,7 +13,8 @@ TARGET = qt_quick3d
 TEMPLATE = app
 
 # ─── QT VERSION CHECK (only 5.15.2) ────────────────────────
-!equals(QT_VERSION, 5.15.2): error("Only Qt 5.15.2 is supported, but using version $$QT_VERSION")
+!equals(QT_VERSION, 5.15.2): \
+    error("Only Qt 5.15.2 is supported, but using version $$QT_VERSION")
 
 # ─── SOURCE FILES ────────────────────────────────────────────
 SOURCES += \
@@ -30,7 +31,9 @@ HEADERS += \
 
 # ─── RESOURCES ───────────────────────────────────────────────
 RESOURCES += \
-    qml.qrc
+    qml.qrc \
+    res_images.qrc \
+    res_web.qrc
 
 # ─── QML_TYPES SETTINGS (Theme singleton) ────────────────────
 CONFIG += qmltypes

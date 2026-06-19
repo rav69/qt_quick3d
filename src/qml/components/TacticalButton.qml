@@ -1,3 +1,7 @@
+// ============================================================
+// src/qml/components/TacticalButton.qml
+// ============================================================
+
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import ThemeModule 1.0
@@ -28,39 +32,21 @@ Item {
         Behavior on border.color { ColorAnimation { duration: 150 } }
 
         // Тактические скобки
-        Rectangle { width: Theme.cornerMarkSize; height: Theme.cornerMarkThick
-            anchors.top: parent.top; anchors.left: parent.left; color: Theme.accentColor }
-        Rectangle { width: Theme.cornerMarkThick; height: Theme.cornerMarkSize
-            anchors.top: parent.top; anchors.left: parent.left; color: Theme.accentColor }
-        Rectangle { width: Theme.cornerMarkSize; height: Theme.cornerMarkThick
-            anchors.top: parent.top; anchors.right: parent.right; color: Theme.accentColor }
-        Rectangle { width: Theme.cornerMarkThick; height: Theme.cornerMarkSize
-            anchors.top: parent.top; anchors.right: parent.right; color: Theme.accentColor }
-        Rectangle { width: Theme.cornerMarkSize; height: Theme.cornerMarkThick
-            anchors.bottom: parent.bottom; anchors.left: parent.left; color: Theme.accentColor }
-        Rectangle { width: Theme.cornerMarkThick; height: Theme.cornerMarkSize
-            anchors.bottom: parent.bottom; anchors.left: parent.left; color: Theme.accentColor }
-        Rectangle { width: Theme.cornerMarkSize; height: Theme.cornerMarkThick
-            anchors.bottom: parent.bottom; anchors.right: parent.right; color: Theme.accentColor }
-        Rectangle { width: Theme.cornerMarkThick; height: Theme.cornerMarkSize
-            anchors.bottom: parent.bottom; anchors.right: parent.right; color: Theme.accentColor }
+        TacticalCorners {
+            anchors.fill: parent
+            cornerSize: Theme.cornerMarkSize
+            cornerThickness: Theme.cornerMarkThick
+            cornerColor: Theme.accentColor
+        }
 
         // Индикатор состояния
-        Rectangle {
+        StatusIndicator {
             id: statusDot
-            width: 8
-            height: 8
-            radius: 4
             anchors.left: parent.left
             anchors.leftMargin: 14
             anchors.verticalCenter: parent.verticalCenter
-            color: btnRoot.statusColor
-
-            SequentialAnimation on opacity {
-                loops: Animation.Infinite
-                NumberAnimation { to: 0.3; duration: 800 }
-                NumberAnimation { to: 1.0; duration: 800 }
-            }
+            indicatorColor: btnRoot.statusColor
+            indicatorSize: 8
         }
 
         Text {

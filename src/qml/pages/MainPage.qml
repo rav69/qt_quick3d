@@ -1,3 +1,7 @@
+// ============================================================
+// src/qml/pages/MainPage.qml
+// ============================================================
+
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick3D 1.15
@@ -50,26 +54,6 @@ Rectangle {
         { modelIndex: 8, cameraPosition: Qt.vector3d(0, 15, 90),  rotationDuration: 8000 }
     ]
 
-    // Индикатор статуса соединения
-    Rectangle {
-        id: statusDot1
-        height: parent.height * .025
-        width: height
-        radius: height / 2
-        color: tcpClient.connected ? "lightgreen" : "red"
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.bottomMargin: 10
-        anchors.leftMargin: 240
-        z: 1
-
-        SequentialAnimation on opacity {
-            loops: Animation.Infinite
-            NumberAnimation { to: 0.3; duration: 800 }
-            NumberAnimation { to: 1.0; duration: 800 }
-        }
-    }
-
     // ЗАГЛУШКА "СВЯЗЬ ОТСУТСТВУЕТ"
     Rectangle {
         id: noConnectionOverlay
@@ -83,6 +67,7 @@ Rectangle {
             color: "transparent"
 
             Repeater {
+                id: r
                 model: 200
                 Rectangle {
                     x: Math.random() * parent.width
@@ -91,30 +76,21 @@ Rectangle {
                     height: 2
                     color: "lightgrey"
                     opacity: 0.5
-//                    SequentialAnimation {
-//                        running: true
-//                        loops: Animation.Infinite
-//                        NumberAnimation {
-//                            target: parent
-//                            property: "opacity"
-//                            from: 0.5
-//                            to: 0.0
-//                            duration: 2000 + Math.random() * 3000
-//                        }
-//                        NumberAnimation {
-//                            target: parent
-//                            property: "opacity"
-//                            from: 0.0
-//                            to: 0.5
-//                            duration: 1000 + Math.random() * 2000
-//                        }
-//                        ScriptAction {
-//                            script: {
-//                                parent.x = Math.random() * parent.parent.width
-//                                parent.y = Math.random() * parent.parent.height
-//                            }
-//                        }
-//                    }
+                }
+            }
+
+            Timer {
+                interval: 300
+                running: true
+                repeat: true
+                onTriggered: {
+                    for (var i = 0; i < r.count; ++i) {
+                        var item = r.itemAt(i)
+                        if (item) {
+                            item.x = Math.random() * parent.width
+                            item.y = Math.random() * parent.height
+                        }
+                    }
                 }
             }
         }
@@ -128,14 +104,12 @@ Rectangle {
             color: "transparent"
 
             // Тактические скобки
-            Rectangle { width: 30; height: 3; anchors.top: parent.top; anchors.left: parent.left; color: Theme.accentColor }
-            Rectangle { width: 3; height: 30; anchors.top: parent.top; anchors.left: parent.left; color: Theme.accentColor }
-            Rectangle { width: 30; height: 3; anchors.top: parent.top; anchors.right: parent.right; color: Theme.accentColor }
-            Rectangle { width: 3; height: 30; anchors.top: parent.top; anchors.right: parent.right; color: Theme.accentColor }
-            Rectangle { width: 30; height: 3; anchors.bottom: parent.bottom; anchors.left: parent.left; color: Theme.accentColor }
-            Rectangle { width: 3; height: 30; anchors.bottom: parent.bottom; anchors.left: parent.left; color: Theme.accentColor }
-            Rectangle { width: 30; height: 3; anchors.bottom: parent.bottom; anchors.right: parent.right; color: Theme.accentColor }
-            Rectangle { width: 3; height: 30; anchors.bottom: parent.bottom; anchors.right: parent.right; color: Theme.accentColor }
+            Components.TacticalCorners {
+                anchors.fill: parent
+                cornerSize: 30
+                cornerThickness: 3
+                cornerColor: Theme.accentColor
+            }
 
             Column {
                 anchors.centerIn: parent
@@ -313,14 +287,6 @@ Rectangle {
             }
         }
     }
-
-    // Статусная строка
-    Components.StatusBar {
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-//        visible: tcpClient.connected
-    }
 }
 
 //import QtQuick 2.15
@@ -416,7 +382,7 @@ Rectangle {
 //    }
 
 //    Rectangle {
-//        id: statusDot1
+//        id: statusDot
 //        height: parent.height * .025
 //        width: height
 //        radius: height / 2

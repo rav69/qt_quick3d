@@ -1,4 +1,6 @@
-//
+// ============================================================
+// src/qml/components/ModelViewer.qml
+// ============================================================
 
 // variant 'original'
 import QtQuick 2.15
@@ -35,8 +37,6 @@ View3D {
             loops: Animation.Infinite
         }
     }
-
-
 
     // test cube
     Model {

@@ -1,3 +1,7 @@
+// ============================================================
+// src/network/TcpClientConnectionHandler.cpp
+// ============================================================
+
 #include "TcpClientConnectionHandler.h"
 #include <QJsonDocument>
 #include <QJsonObject>

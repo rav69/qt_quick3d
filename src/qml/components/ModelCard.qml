@@ -1,3 +1,7 @@
+// ============================================================
+// src/qml/components/ModelCard.qml
+// ============================================================
+
 import QtQuick 2.15
 import QtGraphicalEffects 1.15
 
@@ -26,14 +30,20 @@ Item {
         border.color: Theme.cartBorderColor
 
         // Тактические скобки
-        Rectangle { width: 25; height: 3; anchors.top: parent.top; anchors.left: parent.left; color: Theme.accentColor }
-        Rectangle { width: 3; height: 25; anchors.top: parent.top; anchors.left: parent.left; color: Theme.accentColor }
-        Rectangle { width: 25; height: 3; anchors.top: parent.top; anchors.right: parent.right; color: Theme.accentColor }
-        Rectangle { width: 3; height: 25; anchors.top: parent.top; anchors.right: parent.right; color: Theme.accentColor }
-        Rectangle { width: 25; height: 3; anchors.bottom: parent.bottom; anchors.left: parent.left; color: Theme.accentColor }
-        Rectangle { width: 3; height: 25; anchors.bottom: parent.bottom; anchors.left: parent.left; color: Theme.accentColor }
-        Rectangle { width: 25; height: 3; anchors.bottom: parent.bottom; anchors.right: parent.right; color: Theme.accentColor }
-        Rectangle { width: 3; height: 25; anchors.bottom: parent.bottom; anchors.right: parent.right; color: Theme.accentColor }
+        TacticalCorners {
+            anchors.fill: parent
+            cornerSize: 25
+            cornerThickness: 3
+            cornerColor: Theme.accentColor
+        }
+//        Rectangle { width: 25; height: 3; anchors.top: parent.top; anchors.left: parent.left; color: Theme.accentColor }
+//        Rectangle { width: 3; height: 25; anchors.top: parent.top; anchors.left: parent.left; color: Theme.accentColor }
+//        Rectangle { width: 25; height: 3; anchors.top: parent.top; anchors.right: parent.right; color: Theme.accentColor }
+//        Rectangle { width: 3; height: 25; anchors.top: parent.top; anchors.right: parent.right; color: Theme.accentColor }
+//        Rectangle { width: 25; height: 3; anchors.bottom: parent.bottom; anchors.left: parent.left; color: Theme.accentColor }
+//        Rectangle { width: 3; height: 25; anchors.bottom: parent.bottom; anchors.left: parent.left; color: Theme.accentColor }
+//        Rectangle { width: 25; height: 3; anchors.bottom: parent.bottom; anchors.right: parent.right; color: Theme.accentColor }
+//        Rectangle { width: 3; height: 25; anchors.bottom: parent.bottom; anchors.right: parent.right; color: Theme.accentColor }
 
         ModelViewer {
             anchors.fill: parent

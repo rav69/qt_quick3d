@@ -5,7 +5,9 @@
         <file alias="components/ModelViewer.qml">src/qml/components/ModelViewer.qml</file>
         <file alias="components/SingleModel.qml">src/qml/components/SingleModel.qml</file>
         <file alias="components/StatusBar.qml">src/qml/components/StatusBar.qml</file>
+        <file alias="components/StatusIndicator.qml">src/qml/components/StatusIndicator.qml</file>
         <file alias="components/TacticalButton.qml">src/qml/components/TacticalButton.qml</file>
+        <file alias="components/TacticalCorners.qml">src/qml/components/TacticalCorners.qml</file>
         <file alias="main.qml">src/qml/main.qml</file>
         <file alias="pages/MainPage.qml">src/qml/pages/MainPage.qml</file>
     </qresource>

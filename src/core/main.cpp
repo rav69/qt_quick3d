@@ -1,3 +1,7 @@
+// ============================================================
+// src/core/main.cpp
+// ============================================================
+
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
@@ -28,7 +32,7 @@ int main(int argc, char *argv[])
     QString cfgPath = QCoreApplication::applicationDirPath() + "/client_config.json";
     auto cfg = TcpClientConnectionHandler::loadConfig(cfgPath);
     TcpClientConnectionHandler tcpClient(cfg);
-    // ── Logging state connectiom ──────────────────
+
     QObject::connect(&tcpClient, &TcpClientConnectionHandler::connectionStatusChanged,
         [&cfg](bool connected) {
             if (connected)
