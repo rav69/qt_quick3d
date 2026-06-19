@@ -1,5 +1,12 @@
 <RCC>
     <qresource prefix="/qml">
+        <file alias="components/DynamicModel.qml">src/qml/components/DynamicModel.qml</file>
+        <file alias="components/ModelCard.qml">src/qml/components/ModelCard.qml</file>
+        <file alias="components/ModelViewer.qml">src/qml/components/ModelViewer.qml</file>
+        <file alias="components/SingleModel.qml">src/qml/components/SingleModel.qml</file>
+        <file alias="components/StatusBar.qml">src/qml/components/StatusBar.qml</file>
+        <file alias="components/TacticalButton.qml">src/qml/components/TacticalButton.qml</file>
         <file alias="main.qml">src/qml/main.qml</file>
+        <file alias="pages/MainPage.qml">src/qml/pages/MainPage.qml</file>
     </qresource>
 </RCC>

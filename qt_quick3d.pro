@@ -1,35 +1,53 @@
+# ============================================================
+# qt_quick3d.pro
+# ============================================================
+
+# ─── QT MODULES ──────────────────────────────────────────────
 QT += quick quick3d core network
 
-#equals(QT_MAJOR_VERSION, 4): error("Qt 5 required, but Qt 4 detected!")
+# ─── CONFIGURATION ───────────────────────────────────────────
 CONFIG += c++17 qtconsole
 
-message("Project dir: $$PWD")
-message("QML path: $$PWD/src/qml/main.qml")
-
+# ─── PROJECT NAME ────────────────────────────────────────────
 TARGET = qt_quick3d
 TEMPLATE = app
 
+# ─── QT VERSION CHECK (only 5.15.2) ────────────────────────
+!equals(QT_VERSION, 5.15.2): error("Only Qt 5.15.2 is supported, but using version $$QT_VERSION")
+
+# ─── SOURCE FILES ────────────────────────────────────────────
 SOURCES += \
+    src/core/main.cpp \
     src/models/ModelProvider.cpp \
     src/network/TcpClientConnectionHandler.cpp \
-    src/core/main.cpp
+    src/theme/Theme.cpp
 
+# ─── HEADER FILES ────────────────────────────────────────────
 HEADERS += \
     src/models/ModelProvider.h \
-    src/network/TcpClientConnectionHandler.h
+    src/network/TcpClientConnectionHandler.h \
+    src/theme/Theme.h
 
+# ─── RESOURCES ───────────────────────────────────────────────
 RESOURCES += \
     qml.qrc
-#    \
-#    resources/icons.qrc \
 
-#LIBS += -lGL
+# ─── QML_TYPES SETTINGS (Theme singleton) ────────────────────
+CONFIG += qmltypes
+QML_IMPORT_NAME = ThemeModule
+QML_IMPORT_MAJOR_VERSION = 1
+INCLUDEPATH += $$PWD/src/theme
 
-DEFINES += QT_QUICK3D_PROFILE=1
+# ─── DEFINES ─────────────────────────────────────────────────
+#DEFINES += QT_QUICK3D_PROFILE=1
+CONFIG(debug, debug|release) {
+    DEFINES += QT_QUICK3D_PROFILE=1
+}
+# ─── DEBUG MESSAGES ──────────────────────────────────────────
+message("Project dir: $$PWD")
+message("QML path: $$PWD/src/qml/main.qml")
 
-# ============================================
-# КОПИРОВАНИЕ КОНФИГА В ПАПКУ СБОРКИ
-# ============================================
+# ─── COPY CONFIG TO BUILD FOLDER ─────────────────────────────
 CONFIG += file_copies
 copies.files = $$PWD/src/network/client_config.json
 copies.path = $$OUT_PWD
