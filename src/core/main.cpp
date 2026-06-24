@@ -4,6 +4,7 @@
 
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QtWebEngine/QtWebEngine>
 #include <QQmlContext>
 #include <QSurfaceFormat>
 #include <QDebug>
@@ -25,6 +26,8 @@ int main(int argc, char *argv[])
     format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
     format.setRenderableType(QSurfaceFormat::OpenGL);
     QSurfaceFormat::setDefaultFormat(format);
+
+    QtWebEngine::initialize();
 
     QGuiApplication app(argc, argv);
 

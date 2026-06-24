@@ -5,8 +5,6 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Window 2.15
-import QtWebEngine 1.10
-import QtWebChannel 1.0
 
 import ThemeModule 1.0
 
@@ -23,10 +21,80 @@ ApplicationWindow {
 
     property bool ready: false
 
+    function openMenuItem(index, page) {
+        switch(index) {
+        case 0:
+            root.updatePage(false)
+            break
+        case 1:
+            root.pushPageGroup(page)
+            break
+        case 2:
+            root.pushPageAlgo(page)
+            break
+        case 3:
+            root.pushPageEmpty(page)
+            break
+        default:
+            break
+        }
+    }
+
+    function updatePage(connected) {
+        if (!connected) {
+            while (mainStack.depth > 1) {
+                mainStack.pop()
+            }
+        }
+    }
+
+    function pushPageGroup(url) {
+        var state = mainStack.push(url)
+        state.backGroup.connect(back)
+        state.getFilesGroup.connect(getFilesGroup)
+//        state.uploadGroup.connect(uploadGroup)
+        state.deleteGroup.connect(deleteGroup)
+        state.saveGroup.connect(saveGroup)
+    }
+
+    function pushPageAlgo(url) {
+        var state = mainStack.push(url)
+        state.backAlgo.connect(back)
+    }
+
+    function pushPageEmpty(url) {
+        var state = mainStack.push(url)
+        state.backEmpty.connect(back)
+    }
+
+    function back() {
+        mainStack.pop()
+    }
+
+    function getFilesGroup() {
+        console.log("getFilesGroup")
+        tcpClient.sendGetGroupingFiles()
+    }
+
+    function uploadGroup() {
+        console.log("uploadGroup")
+    }
+
+    function deleteGroup() {
+        console.log("deleteGroup")
+    }
+
+    function saveGroup() {
+        console.log("saveGroup")
+    }
+
     Component.onCompleted: {
         console.log("ROOT completed, setting ready = true")
         root.ready = true
+
+        tcpClient.connectionStatusChanged.connect(updatePage)
     }
+
 
     // ─── STACKVIEW (main content container) ──────────────────
     StackView {
@@ -34,7 +102,9 @@ ApplicationWindow {
         anchors.fill: parent
 
         // Начальная страница
-        initialItem: Pages.MainPage {}
+        initialItem: {
+            Qt.createComponent("qrc:/qml/pages/MapPage.qml").createObject(mainStack)
+        }
     }
 
     // ─── DRAWER (LEFT MENU) ──────────────────────────────────
@@ -64,9 +134,11 @@ ApplicationWindow {
 
                 Repeater {
                     model: [
-                        { name: "Группировка", page: "MainPage.qml" },
-                        { name: "Карта", page: "MapPage.qml" },
-                        { name: "Алгоритмы", page: "AlgorithmsPage.qml" }
+                        { name: "Главный экран", page: "MapPage.qml" },
+                        { name: "Группировка", page: "GroupingPage.qml" },
+//                        { name: "Группировка", page: "GroupingFirstPage.qml" },
+                        { name: "Алгоритмы", page: "AlgorithmsPage.qml" },
+                        { name: "Заглушка", page: "Empty.qml" }
                     ]
 
                     delegate: Item {
@@ -101,11 +173,9 @@ ApplicationWindow {
                             onClicked: {
                                 console.log("▶ Selected:", modelData.name)
                                 menuDrawer.close()
-                                mainStack.push("qrc:/qml/pages/" + modelData.page)
-//                                // Загружаем страницу
-//                                mainMenuPage = stackView.push("qrc:/qml/qml/MainMenu/MainMenu.qml", {
-//                                    stackView: stackView,
-//                                })
+//                                if (modelData.name === "Главный экран") updatePage(false)
+//                                else root.pushPage("qrc:/qml/pages/" + modelData.page)
+                                root.openMenuItem(index, "qrc:/qml/pages/" + modelData.page)
                             }
                         }
 
@@ -161,49 +231,19 @@ ApplicationWindow {
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: menuDrawer.close()
+                    onClicked: {
+                        console.log(mainStack.depth)
+                        menuDrawer.close()
+                    }
                 }
             }
         }
     }
 
-    // ─── MAIN CONTENT ────────────────────────────────────────
-//    Rectangle {
-//        visible: tcpClient.connected
-//        anchors.fill: parent
-//        color: Theme.bgColor
-
-//        // Placeholder image
-//        Image {
-//            anchors.centerIn: parent
-//            source: "qrc:/images/placeholder.png"
-//            fillMode: Image.PreserveAspectFit
-//            opacity: 1
-//            visible: source != ""
-//        }
-
-//        Text {
-//            anchors.centerIn: parent
-//            text: "MAIN CONTENT AREA"
-//            color: "red"
-//            font {
-//                family: Theme.fontFamily
-//                pixelSize: 24
-//                bold: true
-//            }
-//            opacity: 1
-//        }
-//    }
-    WebEngineView {
-        anchors.fill: parent
-        url: "qrc:/web/index.html" // url: "https://madebyevan.com/webgl-water/"
-//        url: "https://yandex.ru/maps/?ll=51.524283%2C55.485362&utm_campaign=desktop&utm_medium=search&utm_source=maps&z=13"
-    }
-
     // ─── MENU TOGGLE BUTTON ──────────────────────────────────
     Rectangle {
         id: menuButton
-        visible: tcpClient.connected
+        visible: mainStack.depth === 1 //rtcpClient.connected
         width: root.width * .04
         height: menuButton.width
         anchors.bottom: parent.bottom

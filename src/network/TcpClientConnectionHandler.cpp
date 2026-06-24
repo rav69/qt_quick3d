@@ -2,11 +2,15 @@
 // src/network/TcpClientConnectionHandler.cpp
 // ============================================================
 
+
 #include "TcpClientConnectionHandler.h"
+#include <QDataStream>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QFile>
 #include <QRandomGenerator>
+#include <QUuid>
+#include <QDateTime>
 
 Q_LOGGING_CATEGORY(lcTcpClient, "tcp.client")
 
@@ -146,6 +150,48 @@ void TcpClientConnectionHandler::disconnectFromServer()
     }
 }
 
+void TcpClientConnectionHandler::sendGetSources()
+{
+    if (!isConnected()) {
+        qCWarning(lcTcpClient) << m_cfg.logPrefix << "Not connected, cannot send request";
+        return;
+    }
+
+    fieldops_Envelope env = fieldops_Envelope_init_zero;
+    QByteArray msgId = QUuid::createUuid().toString().toUtf8();
+    int maxIdLen = sizeof(env.message_id) - 1;
+    strncpy(env.message_id, msgId.constData(), maxIdLen);
+    env.message_id[maxIdLen] = '\0';
+    strncpy(env.action, "get_sources", sizeof(env.action) - 1);
+    env.action[sizeof(env.action) - 1] = '\0';
+    env.timestamp = QDateTime::currentMSecsSinceEpoch();
+
+    env.which_payload = fieldops_Envelope_sources_req_tag;
+    sendProtobuf(env);
+    qCInfo(lcTcpClient) << m_cfg.logPrefix << "Sent GET_SOURCES request ID:" << env.message_id;
+}
+
+void TcpClientConnectionHandler::sendGetGroupingFiles()
+{
+    if (!isConnected()) {
+        qCWarning(lcTcpClient) << m_cfg.logPrefix << "Not connected, cannot send request";
+        return;
+    }
+
+    fieldops_Envelope env = fieldops_Envelope_init_zero;
+    QByteArray msgId = QUuid::createUuid().toString().toUtf8();
+    int maxIdLen = sizeof(env.message_id) - 1;
+    strncpy(env.message_id, msgId.constData(), maxIdLen);
+    env.message_id[maxIdLen] = '\0';
+    strncpy(env.action, "get_grouping_files", sizeof(env.action) - 1);
+    env.action[sizeof(env.action) - 1] = '\0';
+    env.timestamp = QDateTime::currentMSecsSinceEpoch();
+
+    env.which_payload = fieldops_Envelope_grouping_files_req_tag;
+    sendProtobuf(env);
+    qCInfo(lcTcpClient) << m_cfg.logPrefix << "Sent GET_GROUPING_FILES request ID:" << env.message_id;
+}
+
 // ── Slots ──────────────────────────────────────
 
 void TcpClientConnectionHandler::onConnected()
@@ -156,6 +202,12 @@ void TcpClientConnectionHandler::onConnected()
     emit stateChanged("Connected");
     m_heartbeat->start();
     resetWatchdog();
+    m_buffer.clear();
+    m_expectedSize = 0;
+
+    // Отправляем запрос сразу после соединения
+    sendGetSources();
+
 }
 
 void TcpClientConnectionHandler::onDisconnected()
@@ -182,14 +234,24 @@ void TcpClientConnectionHandler::onError(QAbstractSocket::SocketError)
     startReconnect();
 }
 
+void TcpClientConnectionHandler::removePongFromData(QByteArray &data)
+{
+    int pos = data.indexOf("PONG");
+    while (pos != -1) {
+        resetWatchdog();
+        qCDebug(lcTcpClient) << m_cfg.logPrefix << "PONG received, watchdog reset";
+        data.remove(pos, 4);
+        pos = data.indexOf("PONG");
+    }
+}
+
 void TcpClientConnectionHandler::onReadyRead()
 {
     QByteArray data = m_socket->readAll();
-    if (data.contains("PONG")) {
-        resetWatchdog();
-        qCDebug(lcTcpClient) << m_cfg.logPrefix << "PONG";
-    } else {
-        emit dataReceived(data);
+    removePongFromData(data);
+    if (!data.isEmpty()) {
+        m_buffer.append(data);
+        processBuffer();
     }
 }
 
@@ -235,6 +297,116 @@ int TcpClientConnectionHandler::backoffDelay()
     d = qMin(d, m_cfg.reconnectMaxMs);
     if (int j = d / 10; j > 0) d += QRandomGenerator::global()->bounded(j);
     return d;
+}
+
+void TcpClientConnectionHandler::sendProtobuf(const fieldops_Envelope &env)
+{
+    uint8_t buffer[PROTOBUF_SEND_BUFFER_SIZE];
+    pb_ostream_t stream = pb_ostream_from_buffer(buffer, sizeof(buffer));
+    if (!pb_encode(&stream, fieldops_Envelope_fields, &env)) {
+        qCWarning(lcTcpClient) << m_cfg.logPrefix << "Encoding error:" << PB_GET_ERROR(&stream);
+        return;
+    }
+
+    QByteArray frame;
+    QDataStream ds(&frame, QIODevice::WriteOnly);
+    ds << quint32(stream.bytes_written);
+    frame.append((const char*)buffer, stream.bytes_written);
+    m_socket->write(frame);
+}
+
+void TcpClientConnectionHandler::processBuffer()
+{
+    while (true) {
+        if (m_expectedSize == 0 && m_buffer.size() >= 4) {
+            QDataStream ds(m_buffer);
+            ds >> m_expectedSize;
+            m_buffer.remove(0, 4);
+        }
+
+        if (m_expectedSize == 0 || m_buffer.size() < m_expectedSize)
+            break;
+
+        QByteArray msg = m_buffer.left(m_expectedSize);
+        m_buffer.remove(0, m_expectedSize);
+
+        // ===== ОТЛАДОЧНЫЙ ВЫВОД =====
+//        qCInfo(lcTcpClient) << "Received" << m_expectedSize << "bytes";
+//        if (m_expectedSize > 0) {
+//            QByteArray hex = msg.left(100).toHex();
+//            qCInfo(lcTcpClient) << "Hex (first 100 bytes):" << hex;
+//        }
+        // =============================
+
+        fieldops_Envelope env = fieldops_Envelope_init_zero;
+        pb_istream_t stream = pb_istream_from_buffer(
+            (const uint8_t*)msg.constData(), msg.size()
+        );
+        if (!pb_decode(&stream, fieldops_Envelope_fields, &env)) {
+            qCWarning(lcTcpClient) << m_cfg.logPrefix << "Decode error:" << PB_GET_ERROR(&stream);
+            m_expectedSize = 0;
+            continue;
+        }
+        // ===== ДОПОЛНИТЕЛЬНАЯ ОТЛАДКА =====
+//        qCInfo(lcTcpClient) << "Decoded envelope: which_payload =" << env.which_payload;
+
+//        if (env.which_payload == fieldops_Envelope_grouping_files_resp_tag) {
+//            auto &resp = env.payload.grouping_files_resp;
+//            qCInfo(lcTcpClient) << "grouping_files_resp.count =" << resp.count;
+//            qCInfo(lcTcpClient) << "sizeof(files[0]) =" << sizeof(resp.files[0]);
+//            qCInfo(lcTcpClient) << "offsetof(full_path) =" << offsetof(fieldops_GroupingFile, full_path);
+//            qCInfo(lcTcpClient) << "offsetof(name) =" << offsetof(fieldops_GroupingFile, name);
+//            for (int i = 0; i < resp.count && i < 3; ++i) {
+//                qCInfo(lcTcpClient) << "File #" << i
+//                                    << "full_path[0] =" << (int)resp.files[i].full_path[0]
+//                                    << "name[0] =" << (int)resp.files[i].name[0];
+//            }
+//        }
+        // =================================
+        // Обработка ответа (sources)
+        if (env.which_payload == fieldops_Envelope_sources_resp_tag) {
+            int count = env.payload.sources_resp.count;
+            qCInfo(lcTcpClient) << m_cfg.logPrefix << "Received sources count:" << count;
+            emit sourcesReceived(count);
+        }
+
+        // list of saved files (groupings)
+        if (env.which_payload == fieldops_Envelope_grouping_files_resp_tag) {
+            auto &resp = env.payload.grouping_files_resp;
+            qCInfo(lcTcpClient) << m_cfg.logPrefix << "Received grouping files count:" << resp.count;
+
+//            for (int i = 0; i < resp.count; ++i) {
+//                const auto &file = resp.files[i];
+//                qCInfo(lcTcpClient) << m_cfg.logPrefix
+//                                    << "File #" << i
+//                                    << "Name:" << file.name
+//                                    << "Path:" << file.full_path;
+//                // Выведи первые символы, если длины > 0
+//                if (strlen(file.name) > 0) {
+//                    qCInfo(lcTcpClient) << "Name:" << file.name;
+//                }
+//                if (strlen(file.full_path) > 0) {
+//                    qCInfo(lcTcpClient) << "Path:" << file.full_path;
+//                }
+//            }
+            QStringList filePaths;
+            for (int i = 0; i < resp.count; ++i) {
+                filePaths.append(QString::fromUtf8(resp.files[i].full_path));
+            }
+
+            // Отправляем список в QML через сигнал
+            emit groupingFilesReceived(filePaths);
+        }
+
+        m_expectedSize = 0;
+    }
+
+    // Защита от переполнения буфера
+    if (m_buffer.size() > MAX_RECEIVE_BUFFER_SIZE) { // 1 MB
+        qCWarning(lcTcpClient) << m_cfg.logPrefix << "Buffer overflow, resetting";
+        m_buffer.clear();
+        m_expectedSize = 0;
+    }
 }
 
 void TcpClientConnectionHandler::startReconnect()

@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package fieldops;
+
+import "nanopb.proto";  // нужно подключить файл nanopb.proto из папки nanopb
+
+message Envelope {
+    string message_id = 1 [(nanopb).max_size = 64];
+    string action = 2 [(nanopb).max_size = 32];
+    uint64 timestamp = 3;
+    oneof payload {
+        SourcesRequest sources_req = 10;
+        SourcesResponse sources_resp = 11;
+        GroupingFilesRequest grouping_files_req = 12;
+        GroupingFilesResponse grouping_files_resp = 13;
+        ErrorResponse error = 99;
+    }
+}
+
+// ---- Команды ----
+message SourcesRequest {}
+message SourcesResponse {
+    int32 count = 1;
+    repeated Source sources = 2;
+}
+message Source {
+    int32 id = 1;
+    string name = 2;
+    string category = 3;
+}
+
+message GroupingFilesRequest {}
+message GroupingFilesResponse {
+    int32 count = 1;
+    repeated GroupingFile files = 2 [(nanopb).max_count = 2048];
+}
+message GroupingFile {
+    string full_path = 1 [(nanopb).max_size = 512];
+    string name = 2 [(nanopb).max_size = 256];
+}
+
+message ErrorResponse {
+    int32 code = 1;
+    string message = 2;
+}

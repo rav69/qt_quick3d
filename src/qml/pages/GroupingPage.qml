@@ -1,5 +1,5 @@
 // ============================================================
-// src/qml/pages/MainPage.qml
+// src/qml/pages/GroupingPage.qml
 // ============================================================
 
 import QtQuick 2.15
@@ -54,111 +54,27 @@ Rectangle {
         { modelIndex: 8, cameraPosition: Qt.vector3d(0, 15, 90),  rotationDuration: 8000 }
     ]
 
-    // ЗАГЛУШКА "СВЯЗЬ ОТСУТСТВУЕТ"
-    Rectangle {
-        id: noConnectionOverlay
-        anchors.fill: parent
-        color: Theme.bgColor
-        visible: !tcpClient.connected
+    signal backGroup()
+    signal getFilesGroup()
+//    signal uploadGroup()
+    signal deleteGroup()
+    signal saveGroup()
 
-        // Фоновый узор (имитация радиопомех)
-        Rectangle {
-            anchors.fill: parent
-            color: "transparent"
-
-            Repeater {
-                id: r
-                model: 200
-                Rectangle {
-                    x: Math.random() * parent.width
-                    y: Math.random() * parent.height
-                    width: Math.random() * 100 + 20
-                    height: 2
-                    color: "lightgrey"
-                    opacity: 0.5
-                }
-            }
-
-            Timer {
-                interval: 300
-                running: true
-                repeat: true
-                onTriggered: {
-                    for (var i = 0; i < r.count; ++i) {
-                        var item = r.itemAt(i)
-                        if (item) {
-                            item.x = Math.random() * parent.width
-                            item.y = Math.random() * parent.height
-                        }
-                    }
-                }
-            }
-        }
-
-        // Центральная карточка с сообщением
-        Rectangle {
-            id: messageCard
-            width: 480
-            height: 200
-            anchors.centerIn: parent
-            color: "transparent"
-
-            // Тактические скобки
-            Components.TacticalCorners {
-                anchors.fill: parent
-                cornerSize: 30
-                cornerThickness: 3
-                cornerColor: Theme.accentColor
-            }
-
-            Column {
-                anchors.centerIn: parent
-                spacing: 20
-
-                Text {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: "📡"
-                    color: Theme.textHighlight
-                    font.pixelSize: 64
-                    opacity: 0.5
-                    SequentialAnimation on opacity {
-                        loops: Animation.Infinite
-                        NumberAnimation { to: 0.2; duration: 1200 }
-                        NumberAnimation { to: 0.6; duration: 1200 }
-                    }
-                }
-
-                Text {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: "СВЯЗЬ С СЕРВЕРОМ\nОТСУТСТВУЕТ"
-                    color: Theme.textHighlight
-                    font {
-                        family: Theme.fontFamily
-                        pixelSize: 28
-                        bold: true
-                        capitalization: Font.AllUppercase
-                        letterSpacing: 3
-                    }
-                    horizontalAlignment: Text.AlignHCenter
-                }
-
-                Text {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: "ОЖИДАНИЕ ПОДКЛЮЧЕНИЯ..."
-                    color: Theme.textHighlight
-                    font {
-                        family: Theme.fontFamily
-                        pixelSize: 14
-                        letterSpacing: 4
-                    }
-                    horizontalAlignment: Text.AlignHCenter
-                    SequentialAnimation on opacity {
-                        loops: Animation.Infinite
-                        NumberAnimation { to: 0.3; duration: 800 }
-                        NumberAnimation { to: 1.0; duration: 800 }
-                    }
-                }
-            }
+// ─── HEADER ────────────────────────────────────────────────
+    Text {
+        id: header
+        anchors.top: parent.top
+        anchors.topMargin: parent.height * .04
+        anchors.left: parent.left
+        anchors.leftMargin: parent.width * .04
+        text: "ГРУППИРОВКА"
+        color: Theme.textHighlight
+        font {
+            family: Theme.fontFamily
+            pixelSize: 32//28
+            bold: true
+            letterSpacing: 3
+            capitalization: Font.AllUppercase
         }
     }
 
@@ -193,12 +109,12 @@ Rectangle {
         z: 10
 
         Components.TacticalButton {
-            buttonText: "УРОВЕНЬ\nПОДЧИНЕННОСТИ"
+            buttonText: "УРОВЕНЬ ПОДЧ."
             statusColor: "#7CB342"
             onClicked: console.log("▶ Уровень подчиненности")
         }
         Components.TacticalButton {
-            buttonText: "ТИП\nИСТОЧНИКА"
+            buttonText: "ТИП ИСТОЧНИКА"
             statusColor: "#D4A574"
             onClicked: console.log("▶ Тип источника")
         }
@@ -230,7 +146,7 @@ Rectangle {
             onClicked: console.log("▶ Боеготовность")
         }
         Components.TacticalButton {
-            buttonText: "ВТОРОЙ\nУРОВЕНЬ"
+            buttonText: "II-й УРОВЕНЬ"
             statusColor: "#7CB342"
             onClicked: console.log("▶ Второй уровень")
         }
@@ -241,7 +157,7 @@ Rectangle {
         id: smartIndicator
         visible: tcpClient.connected
         anchors.bottom: view.bottom
-        anchors.bottomMargin: 40
+        anchors.bottomMargin: parent.height * .2
         anchors.horizontalCenter: parent.horizontalCenter
         spacing: 8
 
@@ -285,6 +201,73 @@ Rectangle {
                     onClicked: view.currentIndex = realIndex
                 }
             }
+        }
+    }
+
+    // НИЖНИЙ РЯД КНОПОК
+    Row {
+        id: bottomRow
+        visible: tcpClient.connected
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 40
+        anchors.horizontalCenter: parent.horizontalCenter
+        spacing: 67
+        z: 10
+
+        Components.TacticalButton {
+            buttonText: "НАЗАД"
+            indicatorVisible: false
+            onClicked: root.backGroup()
+        }
+        Components.TacticalButton {
+            buttonText: "ЗАГРУЗИТЬ"
+            indicatorVisible: false
+            onClicked: root.getFilesGroup()
+        }
+        Components.TacticalButton {
+            buttonText: "УДАЛИТЬ"
+            indicatorVisible: false
+            onClicked: root.deleteGroup()
+        }
+        Components.TacticalButton {
+            buttonText: "СОХРАНИТЬ"
+            indicatorVisible: false
+            onClicked: root.saveGroup()
+        }
+    }
+
+    //    // Модель для списка (заполняется из C++)
+//    ListModel {
+//        id: fileListModel
+//    }
+
+//    // Сигнал обновления списка (вызывать из C++ при получении ответа)
+//    function updateFileList(files) {
+//        fileListModel.clear()
+//        for (var i = 0; i < files.length; i++) {
+//            fileListModel.append({ "filePath": files[i] })
+//        }
+//    }
+
+    Components.FileListOverlay {
+        id: fileListOverlay
+        anchors.fill: parent
+        title: "СПИСОК ФАЙЛОВ"
+
+        onFileSelected: {
+            console.log("Выбран файл:", filePath)
+            // здесь загружаем выбранный файл
+        }
+        onClosed: {
+            // дополнительная логика при закрытии
+        }
+    }
+
+    Connections {
+        target: tcpClient
+        onGroupingFilesReceived: {
+            fileListOverlay.updateFileList(filePaths)
+            fileListOverlay.visible = true
         }
     }
 }

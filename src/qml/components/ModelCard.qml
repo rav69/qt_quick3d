@@ -36,14 +36,6 @@ Item {
             cornerThickness: 3
             cornerColor: Theme.accentColor
         }
-//        Rectangle { width: 25; height: 3; anchors.top: parent.top; anchors.left: parent.left; color: Theme.accentColor }
-//        Rectangle { width: 3; height: 25; anchors.top: parent.top; anchors.left: parent.left; color: Theme.accentColor }
-//        Rectangle { width: 25; height: 3; anchors.top: parent.top; anchors.right: parent.right; color: Theme.accentColor }
-//        Rectangle { width: 3; height: 25; anchors.top: parent.top; anchors.right: parent.right; color: Theme.accentColor }
-//        Rectangle { width: 25; height: 3; anchors.bottom: parent.bottom; anchors.left: parent.left; color: Theme.accentColor }
-//        Rectangle { width: 3; height: 25; anchors.bottom: parent.bottom; anchors.left: parent.left; color: Theme.accentColor }
-//        Rectangle { width: 25; height: 3; anchors.bottom: parent.bottom; anchors.right: parent.right; color: Theme.accentColor }
-//        Rectangle { width: 3; height: 25; anchors.bottom: parent.bottom; anchors.right: parent.right; color: Theme.accentColor }
 
         ModelViewer {
             anchors.fill: parent
@@ -58,14 +50,14 @@ Item {
     // Заголовок модели
     Text {
         anchors.bottom: card.top
-        anchors.bottomMargin: parent.height * .08
+        anchors.bottomMargin: parent.height * .03
         anchors.horizontalCenter: parent.horizontalCenter
 
         text: root.displayName
         color: Theme.textHighlight
         font {
             pixelSize: Theme.titleFontSize
-            bold: true
+//            bold: true
             capitalization: Font.AllUppercase
             letterSpacing: Theme.letterSpacing
         }
@@ -82,6 +74,7 @@ Item {
 
     // Статус-бар
     Text {
+        visible: false
         anchors.top: card.bottom
         anchors.topMargin: 15
         anchors.horizontalCenter: parent.horizontalCenter

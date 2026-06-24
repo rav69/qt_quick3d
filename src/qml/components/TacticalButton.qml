@@ -14,6 +14,7 @@ Item {
     property string buttonText: ""
     property color statusColor: "#7CB342"
     property bool isActive: false
+    property bool indicatorVisible: true
 
     signal clicked()
 
@@ -42,6 +43,7 @@ Item {
         // Индикатор состояния
         StatusIndicator {
             id: statusDot
+            visible: btnRoot.indicatorVisible
             anchors.left: parent.left
             anchors.leftMargin: 14
             anchors.verticalCenter: parent.verticalCenter
@@ -50,11 +52,12 @@ Item {
         }
 
         Text {
-            anchors.left: statusDot.right
-            anchors.leftMargin: 10
-            anchors.right: parent.right
-            anchors.rightMargin: 10
+//            anchors.left: statusDot.right
+//            anchors.leftMargin: 10
+//            anchors.right: parent.right
+//            anchors.rightMargin: 10
             anchors.verticalCenter: parent.verticalCenter
+            anchors.horizontalCenter: parent.horizontalCenter
 
             text: btnRoot.buttonText
             color: mouseArea.pressed ? Theme.textHighlight
