@@ -13,7 +13,7 @@ Rectangle {
     visible: false
     z: 20
 
-    property string title: "СПИСОК ФАЙЛОВ"
+    property string title: ""
     property string selectedPath: ""   // ← хранит путь выделенного файла
 
     signal fileSelected(string filePath)

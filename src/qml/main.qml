@@ -78,6 +78,7 @@ ApplicationWindow {
 
     function uploadGroup() {
         console.log("uploadGroup")
+        tcpClient.sendGetGroupingFiles()
     }
 
     function deleteGroup() {

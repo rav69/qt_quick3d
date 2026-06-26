@@ -15,6 +15,8 @@ Rectangle {
     id: root
     color: Theme.bgColor
 
+    property string titleDialogWindow: ""
+
     // ДАННЫЕ МОДЕЛЕЙ
     readonly property var nameModels: [
         ["F-35 Lightning II",  "f35",       1],
@@ -213,29 +215,40 @@ Rectangle {
         Components.TacticalButton {
             buttonText: "НАЗАД"
             indicatorVisible: false
-            onClicked: root.backGroup()
+            onClicked: {
+                root.backGroup()
+            }
         }
         Components.TacticalButton {
             buttonText: "ЗАГРУЗИТЬ"
             indicatorVisible: false
-            onClicked: root.getFilesGroup()
+            onClicked: {
+                root.titleDialogWindow = "ЗАГРУЗИТЬ ИСХОДНЫЕ ДАННЫЕ"
+                root.getFilesGroup()
+            }
         }
         Components.TacticalButton {
             buttonText: "УДАЛИТЬ"
             indicatorVisible: false
-            onClicked: root.deleteGroup()
+            onClicked: {
+                root.titleDialogWindow = "СОХРАНИТЬ ИСХОДНЫЕ ДАННЫЕ"
+                root.deleteGroup()
+            }
         }
         Components.TacticalButton {
             buttonText: "СОХРАНИТЬ"
             indicatorVisible: false
-            onClicked: root.saveGroup()
+            onClicked: {
+                root.titleDialogWindow = "УДАЛИТЬ ИСХОДНЫЕ ДАННЫЕ"
+                root.saveGroup()
+            }
         }
     }
 
     Components.FileListOverlay {
         id: fileListOverlay
         anchors.fill: parent
-        title: "СПИСОК ФАЙЛОВ"
+        title: root.titleDialogWindow
 
         onFileSelected: {
             console.log("Выбран файл:", filePath)
