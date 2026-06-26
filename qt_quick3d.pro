@@ -21,6 +21,7 @@ DEFINES += PB_FIELD_32BIT=1
 # ─── SOURCE FILES ────────────────────────────────────────────
 SOURCES += \
     src/core/main.cpp \
+    src/filesystem/VirtualFileTreeModel/VirtualFileTreeModel.cpp \
     src/models/ModelProvider.cpp \
     src/proto/nanopb/pb_common.c \
     src/proto/nanopb/pb_decode.c \
@@ -31,6 +32,7 @@ SOURCES += \
 
 # ─── HEADER FILES ────────────────────────────────────────────
 HEADERS += \
+    src/filesystem/VirtualFileTreeModel/VirtualFileTreeModel.h \
     src/models/ModelProvider.h \
     src/proto/nanopb/pb.h \
     src/proto/nanopb/pb_common.h \

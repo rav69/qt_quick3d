@@ -243,7 +243,7 @@ ApplicationWindow {
     // ─── MENU TOGGLE BUTTON ──────────────────────────────────
     Rectangle {
         id: menuButton
-        visible: mainStack.depth === 1 //rtcpClient.connected
+        visible: mainStack.depth === 1 && tcpClient.connected
         width: root.width * .04
         height: menuButton.width
         anchors.bottom: parent.bottom

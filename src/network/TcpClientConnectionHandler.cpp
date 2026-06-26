@@ -14,7 +14,7 @@
 
 Q_LOGGING_CATEGORY(lcTcpClient, "tcp.client")
 
-// ── Helpers ────────────────────────────────────
+// ── Helpers ──────────────────────────────────────────────────
 
 static QJsonObject section(const QJsonObject &root, const char *key) {
     return root.value(key).toObject();
@@ -32,7 +32,7 @@ static bool boolVal(const QJsonObject &obj, const char *key, bool def) {
     return obj.value(key).toBool(def);
 }
 
-// ── Config Loader ──────────────────────────────
+// ── Config Loader ────────────────────────────────────────────
 
 ClientConfig TcpClientConnectionHandler::loadConfig(const QString &path)
 {
@@ -79,7 +79,7 @@ ClientConfig TcpClientConnectionHandler::loadConfig(const QString &path)
     return c;
 }
 
-// ── Constructor / Destructor ───────────────────
+// ── Constructor / Destructor ─────────────────────────────────
 
 TcpClientConnectionHandler::TcpClientConnectionHandler(const ClientConfig &cfg, QObject *parent)
     : QObject(parent)
@@ -125,7 +125,7 @@ TcpClientConnectionHandler::~TcpClientConnectionHandler()
     }
 }
 
-// ── Public Slots ───────────────────────────────
+// ── Public Slots ─────────────────────────────────────────────
 
 void TcpClientConnectionHandler::connectToServer()
 {
@@ -192,7 +192,28 @@ void TcpClientConnectionHandler::sendGetGroupingFiles()
     qCInfo(lcTcpClient) << m_cfg.logPrefix << "Sent GET_GROUPING_FILES request ID:" << env.message_id;
 }
 
-// ── Slots ──────────────────────────────────────
+void TcpClientConnectionHandler::sendFileOpen(const QString &relPath)
+{
+    if (!isConnected()) {
+        qCWarning(lcTcpClient) << "Not connected";
+        return;
+    }
+
+    fieldops_Envelope env = fieldops_Envelope_init_zero;
+    QByteArray msgId = QUuid::createUuid().toString().toUtf8();
+    strncpy(env.message_id, msgId.constData(), sizeof(env.message_id)-1);
+    strncpy(env.action, "file_open", sizeof(env.action)-1);
+    env.timestamp = QDateTime::currentMSecsSinceEpoch();
+
+    env.which_payload = fieldops_Envelope_file_open_req_tag;
+    strncpy(env.payload.file_open_req.full_path, relPath.toUtf8().constData(), sizeof(env.payload.file_open_req.full_path)-1);
+    env.payload.file_open_req.full_path[sizeof(env.payload.file_open_req.full_path)-1] = '\0';
+
+    sendProtobuf(env);
+    qCInfo(lcTcpClient) << "Sent FILE_OPEN request for:" << relPath;
+}
+
+// ── Private Slots ────────────────────────────────────────────
 
 void TcpClientConnectionHandler::onConnected()
 {
@@ -255,7 +276,7 @@ void TcpClientConnectionHandler::onReadyRead()
     }
 }
 
-// ── Heartbeat ──────────────────────────────────
+// ── Heartbeat ────────────────────────────────────────────────
 
 void TcpClientConnectionHandler::sendHeartbeat()
 {
@@ -276,7 +297,7 @@ void TcpClientConnectionHandler::onHeartbeatTimeout()
     startReconnect();
 }
 
-// ── Reconnect ──────────────────────────────────
+// ── Reconnect ────────────────────────────────────────────────
 
 void TcpClientConnectionHandler::tryReconnect()
 {
@@ -347,55 +368,38 @@ void TcpClientConnectionHandler::processBuffer()
             m_expectedSize = 0;
             continue;
         }
-        // ===== ДОПОЛНИТЕЛЬНАЯ ОТЛАДКА =====
-//        qCInfo(lcTcpClient) << "Decoded envelope: which_payload =" << env.which_payload;
 
-//        if (env.which_payload == fieldops_Envelope_grouping_files_resp_tag) {
-//            auto &resp = env.payload.grouping_files_resp;
-//            qCInfo(lcTcpClient) << "grouping_files_resp.count =" << resp.count;
-//            qCInfo(lcTcpClient) << "sizeof(files[0]) =" << sizeof(resp.files[0]);
-//            qCInfo(lcTcpClient) << "offsetof(full_path) =" << offsetof(fieldops_GroupingFile, full_path);
-//            qCInfo(lcTcpClient) << "offsetof(name) =" << offsetof(fieldops_GroupingFile, name);
-//            for (int i = 0; i < resp.count && i < 3; ++i) {
-//                qCInfo(lcTcpClient) << "File #" << i
-//                                    << "full_path[0] =" << (int)resp.files[i].full_path[0]
-//                                    << "name[0] =" << (int)resp.files[i].name[0];
-//            }
-//        }
         // =================================
-        // Обработка ответа (sources)
-        if (env.which_payload == fieldops_Envelope_sources_resp_tag) {
+        switch (env.which_payload) {
+        case fieldops_Envelope_sources_resp_tag:
+        {
             int count = env.payload.sources_resp.count;
             qCInfo(lcTcpClient) << m_cfg.logPrefix << "Received sources count:" << count;
             emit sourcesReceived(count);
+            break;
         }
-
-        // list of saved files (groupings)
-        if (env.which_payload == fieldops_Envelope_grouping_files_resp_tag) {
+        case fieldops_Envelope_grouping_files_resp_tag:
+        {
             auto &resp = env.payload.grouping_files_resp;
             qCInfo(lcTcpClient) << m_cfg.logPrefix << "Received grouping files count:" << resp.count;
 
-//            for (int i = 0; i < resp.count; ++i) {
-//                const auto &file = resp.files[i];
-//                qCInfo(lcTcpClient) << m_cfg.logPrefix
-//                                    << "File #" << i
-//                                    << "Name:" << file.name
-//                                    << "Path:" << file.full_path;
-//                // Выведи первые символы, если длины > 0
-//                if (strlen(file.name) > 0) {
-//                    qCInfo(lcTcpClient) << "Name:" << file.name;
-//                }
-//                if (strlen(file.full_path) > 0) {
-//                    qCInfo(lcTcpClient) << "Path:" << file.full_path;
-//                }
-//            }
             QStringList filePaths;
             for (int i = 0; i < resp.count; ++i) {
                 filePaths.append(QString::fromUtf8(resp.files[i].full_path));
             }
-
-            // Отправляем список в QML через сигнал
             emit groupingFilesReceived(filePaths);
+            break;
+        }
+        case fieldops_Envelope_file_open_resp_tag:
+        {
+            bool success = env.payload.file_open_resp.success;
+            QString msg = QString::fromUtf8(env.payload.file_open_resp.message);
+            qCInfo(lcTcpClient) << "File open result:" << (success ? "SUCCESS" : "FAILED") << msg;
+            emit fileOpenResult(success, msg);
+            break;
+        }
+        default:
+            break;
         }
 
         m_expectedSize = 0;

@@ -13,11 +13,14 @@ message Envelope {
         SourcesResponse sources_resp = 11;
         GroupingFilesRequest grouping_files_req = 12;
         GroupingFilesResponse grouping_files_resp = 13;
+        FileOpenRequest file_open_req = 14;
+        FileOpenResponse file_open_resp = 15;
         ErrorResponse error = 99;
     }
 }
 
-// ---- Команды ----
+// ─── Request/Response/Data ───────────────────────────────────
+// Source
 message SourcesRequest {}
 message SourcesResponse {
     int32 count = 1;
@@ -29,6 +32,7 @@ message Source {
     string category = 3;
 }
 
+// GroupingFile
 message GroupingFilesRequest {}
 message GroupingFilesResponse {
     int32 count = 1;
@@ -37,6 +41,15 @@ message GroupingFilesResponse {
 message GroupingFile {
     string full_path = 1 [(nanopb).max_size = 512];
     string name = 2 [(nanopb).max_size = 256];
+}
+
+// FileOpenRequest
+message FileOpenRequest {
+    string full_path = 1 [(nanopb).max_size = 512];
+}
+message FileOpenResponse {
+    bool success = 1;
+    string message = 2 [(nanopb).max_size = 256];
 }
 
 message ErrorResponse {

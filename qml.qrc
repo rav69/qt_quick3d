@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/qml">
+        <file alias="components/DirectoryItem.qml">src/qml/components/DirectoryItem.qml</file>
         <file alias="components/DynamicModel.qml">src/qml/components/DynamicModel.qml</file>
         <file alias="components/FileListOverlay.qml">src/qml/components/FileListOverlay.qml</file>
         <file alias="components/ModelCard.qml">src/qml/components/ModelCard.qml</file>

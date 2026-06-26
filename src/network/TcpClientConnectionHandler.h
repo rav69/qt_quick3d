@@ -50,6 +50,7 @@ public slots:
 
     void sendGetSources();
     void sendGetGroupingFiles();
+    void sendFileOpen(const QString &relPath);
 
 signals:
     void connectionStatusChanged(bool connected);
@@ -58,6 +59,7 @@ signals:
     void stateChanged(const QString &state);
     void sourcesReceived(int count);
     void groupingFilesReceived(const QStringList &filePaths);
+    void fileOpenResult(bool success, const QString &message);
 
 private slots:
     void onConnected();

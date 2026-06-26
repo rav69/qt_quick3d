@@ -10,6 +10,7 @@
 #include <QDebug>
 #include <QFile>
 
+#include "../filesystem/VirtualFileTreeModel/VirtualFileTreeModel.h"
 #include "../network/TcpClientConnectionHandler.h"
 #include "../models/ModelProvider.h"
 #include "../theme/Theme.h"
@@ -35,6 +36,7 @@ int main(int argc, char *argv[])
     QString cfgPath = QCoreApplication::applicationDirPath() + "/client_config.json";
     auto cfg = TcpClientConnectionHandler::loadConfig(cfgPath);
     TcpClientConnectionHandler tcpClient(cfg);
+    VirtualFileTreeModel treeModel;
 
     QObject::connect(&tcpClient, &TcpClientConnectionHandler::connectionStatusChanged,
         [&cfg](bool connected) {
@@ -55,11 +57,13 @@ int main(int argc, char *argv[])
         [&cfg]() {
             qCritical() << cfg.logPrefix << "[HEARTBEAT LOST] Server unreachable!";
         });
-    // ── End TCP Client Setup ──────────────────────
+    QObject::connect(&tcpClient, &TcpClientConnectionHandler::groupingFilesReceived,
+                     &treeModel, &VirtualFileTreeModel::setFilePaths);
 
     QQmlApplicationEngine engine;
     ModelProvider modelProvider;
     Theme theme;
+    engine.rootContext()->setContextProperty("virtualFileTreeModel", &treeModel);
     engine.rootContext()->setContextProperty("modelProvider", &modelProvider);
     engine.rootContext()->setContextProperty("tcpClient", &tcpClient);
     engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));

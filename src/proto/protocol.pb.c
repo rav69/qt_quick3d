@@ -34,6 +34,12 @@ PB_BIND(fieldops_GroupingFilesResponse, fieldops_GroupingFilesResponse, 4)
 PB_BIND(fieldops_GroupingFile, fieldops_GroupingFile, 2)
 
 
+PB_BIND(fieldops_FileOpenRequest, fieldops_FileOpenRequest, 2)
+
+
+PB_BIND(fieldops_FileOpenResponse, fieldops_FileOpenResponse, 2)
+
+
 PB_BIND(fieldops_ErrorResponse, fieldops_ErrorResponse, AUTO)
 
 
