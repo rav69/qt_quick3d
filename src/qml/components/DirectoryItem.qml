@@ -25,7 +25,7 @@ Item {
         id: rowRect
         width: root.width
         height: rowHeight
-        color: mouseArea.containsMouse ? Theme.accentColor : (node.fullPath === selectedPath ? Qt.lighter(Theme.accentColor, 1.5) : "transparent")
+        color: mouseArea.containsMouse ? Qt.lighter(Theme.accentColor, .5) : (node.fullPath === selectedPath ? Theme.accentColor : "transparent")
         border.color: node.fullPath === selectedPath ? Theme.textHighlight : "transparent"
         border.width: node.fullPath === selectedPath ? 2 : 0
 
@@ -36,8 +36,10 @@ Item {
             spacing: 8
 
             Text {
+                height: 50
                 text: (!node.isFile && node.children && node.children.length > 0) ? (expanded ? "▼ " : "▶ ") : ""
                 color: Theme.textColor
+                verticalAlignment: Text.AlignVCenter
                 font.pixelSize: 14
                 visible: !node.isFile && node.children && node.children.length > 0
                 MouseArea {
@@ -47,14 +49,18 @@ Item {
             }
 
             Text {
-                text: node.isFile ? "📄 " : "📁 "
+                height: 50
+                text: node.isFile ? "📄 " : ""
                 color: Theme.textColor
+                verticalAlignment: Text.AlignVCenter
                 font.pixelSize: 16
             }
 
             Text {
+                height: 50
                 text: node.name || ""
                 color: Theme.textColor
+                verticalAlignment: Text.AlignVCenter
                 font { family: Theme.fontFamily; pixelSize: 14 }
             }
         }
